@@ -41,11 +41,11 @@
 
 *Oct 26 – Nov 1 · about 20 h*
 
-- [ ] Scaffold the Next.js + TypeScript repo with lint, typecheck and test scripts in CI.
-- [ ] Engine adapters (SPEC §6.1) for OpenAI web_search, Perplexity Sonar and Gemini grounding, with timeouts (CS-5) and max tokens (CS-6).
-- [ ] Pricing table in code plus cost per call (CS-9). Write unit tests against the official price pages.
-- [ ] Brand extraction (alias list + cheap model) and page-type classification for citations.
-- [ ] Command-line tool: `scan --category pest-control-us --questions 10 --runs 1` outputs a JSON and Markdown report.
+- [x] Scaffold the Next.js + TypeScript repo with lint, typecheck and test scripts in CI.
+- [x] Engine adapters (SPEC §6.1) for OpenAI web_search, Perplexity Sonar and Gemini grounding, with timeouts (CS-5) and max tokens (CS-6).
+- [x] Pricing table in code plus cost per call (CS-9). Write unit tests against the official price pages.
+- [x] Brand extraction (alias list + cheap model) and page-type classification for citations. The cheap-model fallback is an interface for now; wire a nano model through the adapter + ledger path in week 2.
+- [x] Command-line tool: `scan --category pest-control-us --questions 10 --runs 1` outputs a JSON and Markdown report.
 - [ ] Run it on 1 real FSM category, check extraction accuracy by hand (target: 90%+ correct brand matches), and fix.
 
 **Exit:** a report you'd publish; the exact cost of the run logged and matching the provider dashboards to within 10%.

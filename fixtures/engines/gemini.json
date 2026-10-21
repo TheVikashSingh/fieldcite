@@ -1,0 +1,46 @@
+{
+  "_note": "Synthetic, hand-written responses shaped like the Gemini generateContent API with Google Search grounding. Used by --dry-run and tests. Not real scan results.",
+  "responses": [
+    {
+      "candidates": [
+        {
+          "content": {
+            "role": "model",
+            "parts": [
+              { "text": "Good choices for a small pest control company include GorillaDesk, FieldRoutes and PestPac. If you want one app for several trades, Housecall Pro is also popular." }
+            ]
+          },
+          "finishReason": "STOP",
+          "groundingMetadata": {
+            "webSearchQueries": ["best pest control software small business"],
+            "groundingChunks": [
+              { "web": { "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/fixture-a", "title": "capterra.com" } },
+              { "web": { "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/fixture-b", "title": "gorilladesk.com" } },
+              { "web": { "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/fixture-c", "title": "reddit.com" } }
+            ]
+          }
+        }
+      ],
+      "usageMetadata": { "promptTokenCount": 18, "candidatesTokenCount": 120, "toolUsePromptTokenCount": 0, "totalTokenCount": 138 }
+    },
+    {
+      "candidates": [
+        {
+          "content": {
+            "role": "model",
+            "parts": [{ "text": "Many reviewers rank Briostack and GorillaDesk highly for pest control." }]
+          },
+          "finishReason": "STOP",
+          "groundingMetadata": {
+            "webSearchQueries": ["pest control software reviews"],
+            "groundingChunks": [
+              { "web": { "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/fixture-d", "title": "youtube.com" } },
+              { "web": { "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/fixture-e", "title": "briostack.com" } }
+            ]
+          }
+        }
+      ],
+      "usageMetadata": { "promptTokenCount": 20, "candidatesTokenCount": 60, "totalTokenCount": 80 }
+    }
+  ]
+}

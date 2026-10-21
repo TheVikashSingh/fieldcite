@@ -1,0 +1,46 @@
+{
+  "_note": "Synthetic, hand-written responses shaped like the Perplexity Sonar API. Used by --dry-run and tests. Not real scan results.",
+  "responses": [
+    {
+      "id": "pplx_fixture_1",
+      "model": "sonar",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Top options for small pest control businesses are GorillaDesk [1], PestPac [2] and FieldRoutes [3]. Some owners on forums also recommend Jobber for its simple invoicing [4]."
+          }
+        }
+      ],
+      "search_results": [
+        { "title": "Best Pest Control Software for 2026", "url": "https://www.softwareadvice.com/pest-control/" },
+        { "title": "PestPac by WorkWave", "url": "https://www.workwave.com/pestpac" },
+        { "title": "Top 10 Pest Control Apps", "url": "https://www.fieldservicereviews.com/top-10-pest-control-apps" },
+        { "title": "Jobber vs GorillaDesk", "url": "https://community.example-pros.com/t/jobber-vs-gorilladesk/42" }
+      ],
+      "usage": { "prompt_tokens": 22, "completion_tokens": 140, "total_tokens": 162 }
+    },
+    {
+      "id": "pplx_fixture_2",
+      "model": "sonar",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Briostack and GorillaDesk are both built for pest control [1][2]. ServiceTitan suits larger companies [3]."
+          }
+        }
+      ],
+      "citations": [
+        "https://www.briostack.com/",
+        "https://www.g2.com/categories/pest-control",
+        "https://www.servicetitan.com/industries/pest-control-software"
+      ],
+      "usage": { "prompt_tokens": 25, "completion_tokens": 96, "total_tokens": 121 }
+    }
+  ]
+}
