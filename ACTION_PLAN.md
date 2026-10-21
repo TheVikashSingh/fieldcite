@@ -126,6 +126,6 @@
 ## Working rules
 
 1. **Spec first.** Change SPEC.md in a pull request before building anything that contradicts it.
-2. **Every pull request passes CI:** markdown lint, spec guard (all CS-x/M-x IDs still present), secret scan, and later lint, typecheck and tests. PRs merge only when every check is green (auto-merge once it's enabled).
+2. **Every pull request passes CI:** markdown lint, spec guard (all CS-x/M-x IDs still present), secret scan, and later lint, typecheck and tests. `main` is protected, and PRs auto-merge only when every check is green.
 3. **No new engine call path without a cost test.** Any code that calls a paid API must go through the adapter + ledger + breaker path.
 4. **Claude Pro budget:** one feature per session; start each session by reading `CLAUDE.md`, and don't run big multi-agent jobs.
