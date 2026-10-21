@@ -1,0 +1,29 @@
+{
+  "slug": "hvac",
+  "name": "HVAC software",
+  "trade": "HVAC",
+  "brands": [
+    { "name": "ServiceTitan", "domain": "servicetitan.com", "aliases": ["Service Titan"] },
+    { "name": "Jobber", "domain": "getjobber.com" },
+    { "name": "Housecall Pro", "domain": "housecallpro.com", "aliases": ["HousecallPro", "Housecall"] },
+    { "name": "FieldEdge", "domain": "fieldedge.com", "aliases": ["Field Edge"] },
+    { "name": "Service Fusion", "domain": "servicefusion.com", "aliases": ["ServiceFusion"] },
+    { "name": "Joist", "domain": "joist.com" },
+    { "name": "Workiz", "domain": "workiz.com" },
+    { "name": "Kickserv", "domain": "kickserv.com" },
+    { "name": "Commusoft", "domain": "commusoft.com" },
+    { "name": "Tradify", "domain": "tradifyhq.com" }
+  ],
+  "questions": [
+    "What is the best scheduling and invoicing software for a small HVAC company?",
+    "Best HVAC dispatch software for a 5-technician company",
+    "Jobber alternatives for an HVAC business",
+    "Cheapest HVAC quoting app for a solo technician",
+    "Housecall Pro vs Jobber for HVAC contractors",
+    "Best HVAC CRM with maintenance agreements",
+    "Which field service software do HVAC companies use most?",
+    "Best HVAC software with a technician mobile app",
+    "ServiceTitan alternatives for a small HVAC company",
+    "Best HVAC business software with online booking"
+  ]
+}

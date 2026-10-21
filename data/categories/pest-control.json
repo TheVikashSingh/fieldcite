@@ -1,0 +1,29 @@
+{
+  "slug": "pest-control",
+  "name": "Pest control software",
+  "trade": "pest control",
+  "brands": [
+    { "name": "GorillaDesk", "domain": "gorilladesk.com" },
+    { "name": "PestPac", "domain": "workwave.com", "aliases": ["PestPac by WorkWave", "WorkWave PestPac"] },
+    { "name": "FieldRoutes", "domain": "fieldroutes.com", "aliases": ["Field Routes", "PestRoutes"] },
+    { "name": "Briostack", "domain": "briostack.com" },
+    { "name": "Jobber", "domain": "getjobber.com" },
+    { "name": "Housecall Pro", "domain": "housecallpro.com", "aliases": ["HousecallPro", "Housecall"] },
+    { "name": "ServiceTitan", "domain": "servicetitan.com", "aliases": ["Service Titan"] },
+    { "name": "ServiceM8", "domain": "servicem8.com" },
+    { "name": "Commusoft", "domain": "commusoft.com" },
+    { "name": "Joblogic", "domain": "joblogic.com" }
+  ],
+  "questions": [
+    "What is the best pest control software for a small business?",
+    "Which scheduling and routing app should a 3-person pest control company use?",
+    "GorillaDesk alternatives for a pest control business",
+    "What is the cheapest pest control software with invoicing and chemical tracking?",
+    "PestPac vs FieldRoutes for a growing pest control company",
+    "Best field service app for a solo pest control technician",
+    "Which pest control software has the best mobile app for technicians?",
+    "Best CRM for pest control companies",
+    "What software do pest control companies use for recurring service routes?",
+    "Best pest control business software with online booking and payments"
+  ]
+}

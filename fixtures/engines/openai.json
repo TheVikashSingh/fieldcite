@@ -1,0 +1,60 @@
+{
+  "_note": "Synthetic, hand-written responses shaped like the OpenAI Responses API. Used by --dry-run and tests. Not real scan results.",
+  "responses": [
+    {
+      "id": "resp_fixture_1",
+      "object": "response",
+      "status": "completed",
+      "model": "gpt-5-mini",
+      "output": [
+        { "type": "reasoning", "id": "rs_1", "summary": [] },
+        { "type": "web_search_call", "id": "ws_1", "status": "completed" },
+        {
+          "type": "message",
+          "id": "msg_1",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "For a small pest control company, the most recommended options are:\n\n1. **GorillaDesk**: built for pest control, with routing and chemical tracking.\n2. **PestPac** (by WorkWave): a long-standing choice for larger operators.\n3. **FieldRoutes**: strong for recurring service routes.\n4. **Jobber**: a general field-service app that many small crews use.",
+              "annotations": [
+                { "type": "url_citation", "url": "https://www.g2.com/categories/pest-control", "title": "Best Pest Control Software | G2" },
+                { "type": "url_citation", "url": "https://gorilladesk.com/blog/best-pest-control-software/", "title": "The 7 Best Pest Control Software Tools" },
+                { "type": "url_citation", "url": "https://www.reddit.com/r/pestcontrol/comments/abc123/what_software_do_you_use/", "title": "What software do you use? : r/pestcontrol" },
+                { "type": "url_citation", "url": "https://www.fieldroutes.com/", "title": "FieldRoutes" }
+              ]
+            }
+          ]
+        }
+      ],
+      "usage": { "input_tokens": 8240, "output_tokens": 610, "total_tokens": 8850 }
+    },
+    {
+      "id": "resp_fixture_2",
+      "object": "response",
+      "status": "completed",
+      "model": "gpt-5-mini",
+      "output": [
+        { "type": "web_search_call", "id": "ws_2", "status": "completed" },
+        { "type": "web_search_call", "id": "ws_3", "status": "completed" },
+        {
+          "type": "message",
+          "id": "msg_2",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "Popular picks include Briostack, ServiceTitan for bigger teams, and Housecall Pro or Jobber if you also do general home services. GorillaDesk is the budget-friendly specialist.",
+              "annotations": [
+                { "type": "url_citation", "url": "https://www.capterra.com/pest-control-software/", "title": "Best Pest Control Software 2026 | Capterra" },
+                { "type": "url_citation", "url": "https://www.youtube.com/watch?v=fixture01", "title": "Pest control software compared" },
+                { "type": "url_citation", "url": "https://smallcrewhq.com/best-pest-control-software", "title": "Best Pest Control Software for Small Crews" }
+              ]
+            }
+          ]
+        }
+      ],
+      "usage": { "input_tokens": 11030, "output_tokens": 480, "total_tokens": 11510 }
+    }
+  ]
+}
