@@ -38,6 +38,8 @@ FieldCite is a **self-serve SaaS** that:
 | Low AEO sophistication | Mid-tier vertical-SaaS marketing teams rarely run AI-answer programs today. |
 | Few competitors with a vertical focus | AEO tools are horizontal. None is built for this vertical (checked again in week 0). |
 
+**Result (2026-10-21): FSM scored 8/10. Proceed.** Details are in [docs/week0-vertical-test.md](docs/week0-vertical-test.md).
+
 **Validation gate (week 0):** run the vertical test in [ACTION_PLAN.md](ACTION_PLAN.md#week-0--validate-the-niche-and-set-up-accounts) and score FSM from 0 to 10. A score of 6 or more means proceed. Below 6, switch to the fallback niche, **clinic and practice software** (physio, chiro, therapy, dental), and rerun the test.
 
 ## 3. The problem and our promise
@@ -141,6 +143,7 @@ Baseline cost control: refresh public categories **monthly** at launch and move 
 - Each question is asked **twice per engine** on paid plans, and the report shows how often each brand appeared (e.g. "Jobber: 5/6 answers").
 - Every report shows: *"Results come from each engine's official API with web search enabled. This approximates, but does not exactly match, what people see in the consumer apps. AI answers vary between runs."*
 - Do not claim Google AI Mode coverage. Do not use statistics we can't source.
+- **Location is pinned on every call.** Answers change with the asker's country (seen in the week-0 test), so each scan stores the target country and passes it to every engine: OpenAI's web-search user location, and an explicit country in the question for the other engines.
 - Brand extraction uses an alias list per brand plus a cheap model. A wrong match is a bug, so show the matching answer text on hover.
 
 ## 9. Cost safety: non-negotiable invariants
