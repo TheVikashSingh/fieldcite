@@ -13,15 +13,19 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "scan": "tsx src/cli/scan.ts"
+    "scan": "tsx src/cli/scan.ts",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "test:db": "vitest run src/ledger"
   },
   "dependencies": {
     "next": "^16.4.2",
+    "pg": "^8.23.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
