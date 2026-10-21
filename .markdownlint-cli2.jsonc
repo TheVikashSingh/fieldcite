@@ -1,0 +1,13 @@
+{
+  // Prose-heavy docs: long lines and tables are expected.
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD033": false,
+    "MD024": { "siblings_only": true },
+    "MD036": false,
+    "MD060": false
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules/**"]
+}
