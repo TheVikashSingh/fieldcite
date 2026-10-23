@@ -55,11 +55,11 @@
 *Nov 2–8 · about 22 h*
 
 - [x] Supabase schema (SPEC §6.2) with migrations and row-level security.
-- [ ] Store every call, answer, mention and citation (M-1). Set up the `cited_pages` table (M-2).
+- [x] Store every call, answer, mention and citation (M-1). Set up the `cited_pages` table (M-2).
 - [x] **Credit ledger with atomic reservation (CS-4)**, including concurrency tests (two scans racing for the last credits).
 - [x] Hard per-scan limits, 1 running scan per account, retry policy (CS-5).
-- [ ] `spend_daily` rollup, **circuit breakers (CS-7)**, **kill switch (CS-8)**, daily spend email (CS-9, CS-13).
-- [ ] Answer cache (CS-10).
+- [x] `spend_daily` rollup, **circuit breakers (CS-7)**, **kill switch (CS-8)**, daily spend email (CS-9, CS-13). The email body is built behind a notifier interface; sending it needs Resend (week 3+).
+- [x] Answer cache (CS-10).
 - [ ] Background job runner (Trigger.dev or Inngest) running scans.
 
 **Exit:** tests prove a scan can't exceed its reservation, breakers trip at the thresholds, and the kill switch stops calls in under 60 s.

@@ -48,11 +48,18 @@ The credit ledger lives in Postgres functions (`supabase/migrations/*_credit_led
 - each `engine_calls` row is charged to the reservation, and calls past it are refused;
 - `finish_scan` refunds the unused calls, once.
 
-`runScan` takes an optional `storage` (`PgScanStorage` in `src/ledger/scan-storage.ts`) to write each call's cost to `engine_calls` (CS-9). The CLI doesn't use one, so it still runs without a database.
+`runScan` takes an optional `storage` (`PgScanStorage` in `src/ledger/scan-storage.ts`), which records each call through `record_engine_call` (`supabase/migrations/*_spend_breakers_cache.sql`) in one transaction: the `engine_calls` cost row (CS-9), its `spend_daily` rollup, the answer, citations and brand mentions (M-1), and a fresh `answer_cache` entry. The CLI doesn't use one, so it still runs without a database.
+
+Cost safety around every call (`src/cost/`):
+
+- **Kill switch (CS-8):** `runScan` reads `SCANS_ENABLED` before every call, and the adapters read it again before every attempt and retry.
+- **Circuit breakers (CS-7):** `PgCallGate` calls `check_breakers` before every call. Free scans pause at $10/day of free spend; everything except paid scans already running pauses at $30/day in total; baseline scans pause when baseline spend in a calendar month reaches its forecast plus $60. Limits and forecasts are in the one-row `cost_settings` table (limits can only be lowered). Trips are rows in `breaker_trips`, the `breaker_status` view shows the current state, and each trip is sent once to a `Notifier` (`LogNotifier` for now; email comes later). Days and months are UTC.
+- **Answer cache (CS-10):** `PgAnswerCache` reuses an answer for 72 h when the engine, model, normalized question, country and run number match. A hit costs $0, is recorded as a `cache_hit` call and stores its own copy of the answer.
+- **Daily spend summary (CS-9, CS-13):** `sendDailySpendSummary` builds the owner email (spend by engine, scan type and account, the top 5 accounts, and 50/80/100% of monthly forecast alerts) and hands it to the notifier. Nothing sends email yet.
 
 ### Database tests
 
-The concurrency tests in `src/ledger/ledger.db.test.ts` need a real Postgres. They are skipped when `DATABASE_URL` is unset and only run against `localhost`. CI runs them in the `db-test` job. To run them locally with Docker:
+The `*.db.test.ts` files (credit ledger concurrency in `src/ledger/`, breakers, cache and spend in `src/cost/`) need a real Postgres. They are skipped when `DATABASE_URL` is unset and only run against `localhost`. CI runs them in the `db-test` job. To run them locally with Docker:
 
 ```bash
 docker run -d --name fieldcite-pg -e POSTGRES_PASSWORD=postgres -p 55432:5432 postgres:17

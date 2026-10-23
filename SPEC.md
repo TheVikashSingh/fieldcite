@@ -121,7 +121,8 @@ interface EngineAdapter {
 - `citations` (answer_id, url, cited_page_id)
 - `cited_pages`, the **action database** (url, domain, page_type, publisher, contact_url, submission_url, affiliate_program, sponsorship_price, brands_mentioned[], last_fetched_at, curator_notes, outreach_outcome)
 - `credit_ledger` (account_id, delta, reason, scan_id, balance_after), `spend_daily` (date, engine, scope, usd)
-- `answer_cache` (engine, model, normalized_question_hash, answer_id, expires_at)
+- `answer_cache` (engine, model, normalized_question_hash, answer_id, expires_at); the hash covers the normalized question, country and run number
+- `cost_settings` (breaker limits and forecasts), `breaker_trips` and the `breaker_status` view (CS-7)
 
 ## 7. Plans, quotas and unit economics
 
@@ -158,10 +159,10 @@ A single abusive user, retry loop or leaked key must never produce a surprise bi
 | **CS-4** | **Atomic credit reservation.** Before a scan starts, it reserves its full call budget in `credit_ledger` in one transaction. If the balance is too low, it is rejected. Unused calls are refunded on completion. Covered by concurrency tests. |
 | **CS-5** | **Hard limits per scan:** at most 150 calls per scan; at most 1 running scan per account; at most 60 s per call; at most 2 retries with exponential backoff, and only on retryable errors. No retry loops anywhere. |
 | **CS-6** | **Max output tokens set on every LLM call.** Answer calls are capped at 1,200 tokens, extraction and classification at 400, fix lists at 1,500. |
-| **CS-7** | **Global circuit breakers** on `spend_daily`. At $10/day on free scans, pause free scans. At $30/day total, pause everything except in-flight paid scans. At $60 per calendar month above forecast, pause baseline scans. Each trip emails the owner. |
+| **CS-7** | **Global circuit breakers** on `spend_daily`, checked before every engine call. At $10/day on free scans, pause free scans. At $30/day total, pause everything except in-flight paid scans (paid scans started before the trip). At $60 per calendar month above forecast (baseline spend this month ≥ baseline forecast + $60), pause baseline scans. Days and months are UTC. Each trip emails the owner. |
 | **CS-8** | **Kill switch:** the `SCANS_ENABLED=false` environment flag stops all new engine calls within 60 s, with no deploy needed. |
 | **CS-9** | **Every call's cost is logged** (tokens × a pricing table in code, plus search fees) to `engine_calls.cost_usd`. A daily spend email shows spend by engine, by account and the top 5 accounts by spend. |
-| **CS-10** | **Answer cache:** identical (engine, model, normalized question) results are reused for 72 h across accounts. A cache hit costs $0 and still counts as history (M-1). |
+| **CS-10** | **Answer cache:** identical (engine, model, normalized question, country, run number) results are reused for 72 h across accounts. Country is in the key because answers change by country (§8); the run number keeps a paid scan's two runs per engine two real answers. A cache hit costs $0 and still counts as history (M-1). |
 | **CS-11** | **Free-scan abuse controls:** Turnstile; a verified email; 1 free scan per domain and per email per 30 days; disposable-email blocklist; max 3 free scans per IP per day; no free scans while the CS-7 free breaker is tripped. |
 | **CS-12** | **Keys are server-side only.** No API key in client bundles or the repo; CI runs secret scanning on every pull request; keys are rotated on any suspected leak; each provider key is restricted to the minimum permissions/projects. |
 | **CS-13** | **Spend alerts at 50% / 80% / 100%** of the monthly forecast, both in the providers' consoles and in our own daily email. |
