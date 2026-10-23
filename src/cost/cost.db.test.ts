@@ -295,7 +295,8 @@ describe.skipIf(!url)("cost safety (Postgres)", () => {
       const t = uniqueMonth();
       const q = `Best pest control software? ${Math.random()}`;
       const first = await scanOnce(q, t);
-      expect(first.result.calls[0]).toMatchObject({ status: "ok", cacheHit: undefined });
+      expect(first.result.calls[0].status).toBe("ok");
+      expect(first.result.calls[0].cacheHit).toBeUndefined();
       const [original] = await history(first.scanId);
       expect(original.cache_hit).toBe(false);
       expect(Number(original.cost_usd)).toBeGreaterThan(0);
