@@ -15,7 +15,7 @@
     "test": "vitest run",
     "scan": "tsx src/cli/scan.ts",
     "db:migrate": "tsx scripts/db-migrate.ts",
-    "test:db": "vitest run src/ledger"
+    "test:db": "vitest run db.test"
   },
   "dependencies": {
     "next": "^16.4.2",
