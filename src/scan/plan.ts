@@ -20,6 +20,8 @@ export interface ScanPlan {
   questions: string[];
   runs: number;
   engines: EngineId[];
+  /** The customer's brand, one of the category's brands. Gaps and the fix list need it (F-2, F-3). */
+  targetBrand?: string;
   maxOutputTokens: number;
   timeoutMs: number;
   totalCalls: number;
@@ -57,12 +59,27 @@ export function parseEngines(value: string): EngineId[] {
   return list as EngineId[];
 }
 
+/** Matches --brand against the category's brand names and aliases, ignoring case. */
+export function resolveTargetBrand(category: Category, value: string): string {
+  const v = value.trim().toLowerCase();
+  const brand = category.brands.find((b) => [b.name, ...(b.aliases ?? [])].some((n) => n.toLowerCase() === v));
+  if (!brand) throw new PlanError(`--brand must be one of the ${category.slug} brands (${category.brands.map((b) => b.name).join(", ")}); got "${value}".`);
+  return brand.name;
+}
+
 function positiveInt(name: string, value: number): number {
   if (!Number.isInteger(value) || value < 1) throw new PlanError(`${name} must be a whole number of at least 1; got ${value}.`);
   return value;
 }
 
-export function planScan(input: { category: Category; country: Country; questions: number; runs: number; engines: EngineId[] }): ScanPlan {
+export function planScan(input: {
+  category: Category;
+  country: Country;
+  questions: number;
+  runs: number;
+  engines: EngineId[];
+  targetBrand?: string;
+}): ScanPlan {
   const n = positiveInt("--questions", input.questions);
   const runs = positiveInt("--runs", input.runs);
   if (n > input.category.questions.length) {
@@ -76,6 +93,7 @@ export function planScan(input: { category: Category; country: Country; question
     questions: input.category.questions.slice(0, n),
     runs,
     engines: input.engines,
+    ...(input.targetBrand !== undefined ? { targetBrand: resolveTargetBrand(input.category, input.targetBrand) } : {}),
     maxOutputTokens: MAX_ANSWER_OUTPUT_TOKENS,
     timeoutMs: MAX_TIMEOUT_MS,
     totalCalls,

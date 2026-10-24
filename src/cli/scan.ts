@@ -1,7 +1,7 @@
 // Command-line scanner (ACTION_PLAN week 1).
 //
 //   npm run scan -- --category pest-control --country US --questions 5 --runs 1 \
-//     --engines openai,perplexity,gemini --dry-run
+//     --engines openai,perplexity,gemini --brand Briostack --dry-run
 //
 // Real runs need API keys in .env and --confirm, after showing the worst-case cost.
 
@@ -14,11 +14,13 @@ import { scansEnabled, type Env } from "../engines/guard";
 import type { EngineAdapter, EngineId } from "../engines/types";
 import { AliasBrandExtractor, type BrandExtractor } from "../extract/brands";
 import { estimateMaxCostUsd, loadCategory, parseCountry, parseEngines, planScan } from "../scan/plan";
-import { buildReport, toMarkdown } from "../scan/report";
+import { buildReport, toMarkdown, type ScanReport } from "../scan/report";
 import { runScan } from "../scan/run";
 
 const USAGE = `Usage: scan --category <slug> --country <US|UK|CA|AU> --questions N [--runs R]
-            [--engines openai,perplexity,gemini] [--dry-run] [--confirm] [--out out]`;
+            [--engines openai,perplexity,gemini] [--brand <your brand>] [--dry-run] [--confirm] [--out out]
+
+  --brand   the customer's brand, one of the category's brands. Adds the gaps view and fix list.`;
 
 export interface CliDeps {
   env?: Env;
@@ -41,6 +43,7 @@ export async function main(argv: string[], deps: CliDeps = {}): Promise<number> 
         questions: { type: "string" },
         runs: { type: "string", default: "1" },
         engines: { type: "string", default: "openai,perplexity,gemini" },
+        brand: { type: "string" },
         "dry-run": { type: "boolean", default: false },
         confirm: { type: "boolean", default: false },
         out: { type: "string", default: "out" },
@@ -69,6 +72,7 @@ export async function main(argv: string[], deps: CliDeps = {}): Promise<number> 
       questions: Number(values.questions),
       runs: Number(values.runs),
       engines: parseEngines(values.engines),
+      targetBrand: values.brand,
     });
     const dryRun = values["dry-run"];
     const maxCost = estimateMaxCostUsd(plan);
@@ -90,6 +94,7 @@ export async function main(argv: string[], deps: CliDeps = {}): Promise<number> 
     const base = join(outDir, `scan-${plan.category.slug}-${plan.country.toLowerCase()}-${dryRun ? "dryrun-" : ""}${stamp}`);
     writeFileSync(`${base}.json`, `${JSON.stringify(report, null, 2)}\n`);
     writeFileSync(`${base}.md`, toMarkdown(report));
+    for (const line of summaryLines(report)) log(line);
     log(`Done: ${report.totals.ok}/${plan.totalCalls} calls ok, cost $${report.totals.costUsd.toFixed(4)}.`);
     log(`Wrote ${base}.json and ${base}.md`);
     return report.totals.ok > 0 ? 0 : 1;
@@ -97,6 +102,19 @@ export async function main(argv: string[], deps: CliDeps = {}): Promise<number> 
     log(`Error: ${err instanceof Error ? err.message : String(err)}`);
     return 1;
   }
+}
+
+/** Gaps and fix list for the terminal; the full detail is in the written reports. */
+export function summaryLines(report: ScanReport): string[] {
+  if (!report.targetBrand || !report.gaps || !report.fixList) return ["No --brand given: no gaps view or fix list."];
+  const lines = [`Gaps for ${report.targetBrand}: ${report.gaps.length} cited page(s) back answers that name competitors but not ${report.targetBrand}.`];
+  for (const g of report.gaps.slice(0, 5)) {
+    lines.push(`  - ${g.domain} (${g.pageType}): cited in ${g.citedIn}/${g.answers} answers, ${g.gapAnswers} without ${report.targetBrand}; ${g.engines.join(", ")}; names ${g.competitors.join(", ")}`);
+  }
+  lines.push(`Fix list (${report.fixList.length} actions):`);
+  for (const a of report.fixList) lines.push(`  ${a.rank}. ${a.title} [score ${a.strength.score}; evidence ${[...new Set(a.evidence.map((e) => e.answerId))].join(", ")}]`);
+  if (report.fixListNote) lines.push(`  ${report.fixListNote}`);
+  return lines;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

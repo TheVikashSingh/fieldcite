@@ -44,6 +44,41 @@ describe("scan CLI", () => {
     expect(md).toContain("| GorillaDesk | 6/6 | 6/6 | 6/6 | 18/18 |");
   });
 
+  it("--brand adds gaps and a fix list to the reports and the output", async () => {
+    const out = tempOut();
+    const lines: string[] = [];
+    const args = ["--category", "pest-control", "--country", "US", "--questions", "3", "--runs", "1", "--brand", "Briostack", "--dry-run", "--out", out];
+    expect(await main(args, { env: {}, log: (l) => lines.push(l) })).toBe(0);
+
+    const files = readdirSync(out).sort();
+    const report = JSON.parse(readFileSync(join(out, files[0]), "utf8")) as ScanReport;
+    expect(report.targetBrand).toBe("Briostack");
+    expect(report.gaps!.length).toBeGreaterThan(0);
+    expect(report.fixList!.length).toBeGreaterThanOrEqual(5);
+    expect(report.fixList!.length).toBeLessThanOrEqual(15);
+    expect(report.fixList![0].kind).toBe("comparison_page");
+    for (const a of report.fixList!) {
+      expect(a.evidence.length).toBeGreaterThan(0);
+      for (const e of a.evidence) expect(report.calls[e.callIndex].mentions.some((m) => m.brand === "Briostack")).toBe(false);
+    }
+
+    const md = readFileSync(join(out, files[1]), "utf8");
+    expect(md).toContain("## Gaps: pages that cite competitors and not Briostack");
+    expect(md).toContain("## Fix list for Briostack");
+    const text = lines.join("\n");
+    expect(text).toMatch(/Gaps for Briostack: \d+ cited page/);
+    expect(text).toMatch(/Fix list \(\d+ actions\):\n {2}1\. Publish your own/);
+  });
+
+  it("rejects a --brand outside the category before any call", async () => {
+    const lines: string[] = [];
+    const factory = vi.fn(createAdapters);
+    const code = await main([...ARGS, "--brand", "Workiz", "--dry-run"], { env: {}, log: (l) => lines.push(l), createAdapters: factory });
+    expect(code).toBe(1);
+    expect(lines.join("\n")).toContain("--brand must be one of the pest-control brands");
+    expect(factory).not.toHaveBeenCalled();
+  });
+
   it("honors SCANS_ENABLED=false before doing anything (CS-8)", async () => {
     const out = tempOut();
     const factory = vi.fn(createAdapters);

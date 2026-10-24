@@ -11,6 +11,8 @@ export const MAX_TIMEOUT_MS = 60_000;
 export const MAX_RETRIES = 2;
 /** CS-6: answer calls are capped at 1,200 output tokens. */
 export const MAX_ANSWER_OUTPUT_TOKENS = 1_200;
+/** CS-6: fix-list calls are capped at 1,500 output tokens. */
+export const MAX_FIX_LIST_OUTPUT_TOKENS = 1_500;
 
 export class ScansDisabledError extends Error {
   constructor() {
