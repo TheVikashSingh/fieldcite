@@ -70,7 +70,7 @@
 
 - [ ] Landing page and free-scan form (F-1) with Turnstile, email verification and the abuse rules (CS-11).
 - [ ] Report page (F-2): share of voice, per-question answers, citations, gaps view, method and disclaimer (SPEC §8).
-- [ ] Fix-list generator (F-3) using FSM templates (M-4), with every action linked to stored evidence.
+- [x] Fix-list generator (F-3) using FSM templates (M-4), with every action linked to stored evidence. The gaps view data (F-2) and `--brand` on the scan CLI come with it; any LLM rewording sits behind an interface capped at 1,500 output tokens (CS-6) and is not wired up yet.
 - [ ] Cited-page enrichment (M-2): polite fetch, robots.txt respected, submission/affiliate/contact detection.
 - [ ] Magic-link login (F-9).
 

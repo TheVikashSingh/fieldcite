@@ -3,6 +3,8 @@
 import { PRICES_CHECKED_ON } from "../engines/pricing";
 import { COUNTRY_NAMES, type EngineId } from "../engines/types";
 import { PAGE_TYPES, type PageType } from "../extract/classify";
+import { generateFixList, MIN_FIXES, type FixAction } from "../fixlist/generate";
+import { answerId, findGaps, type GapPage } from "../fixlist/gaps";
 import type { ScanResult } from "./run";
 
 export const METHOD_NOTE =
@@ -45,6 +47,14 @@ export interface ScanReport {
   shareOfVoice: ShareOfVoiceRow[];
   citedPages: CitedPageRow[];
   pageTypeCounts: Record<PageType, number>;
+  /** The customer's brand (--brand). Without it there are no gaps and no fix list. */
+  targetBrand: string | null;
+  /** F-2 gaps view: pages cited by answers that name competitors but not the target. */
+  gaps: GapPage[] | null;
+  /** F-3: ranked actions; evidence refs point into `calls`. */
+  fixList: FixAction[] | null;
+  /** Set when the evidence supports fewer than 5 actions. */
+  fixListNote?: string;
   calls: ScanResult["calls"];
 }
 
@@ -97,6 +107,17 @@ export function buildReport(result: ScanResult): ScanReport {
   const engineModels = new Map<EngineId, string>();
   for (const c of calls) if (c.model && !engineModels.has(c.engine)) engineModels.set(c.engine, c.model);
 
+  const target = plan.targetBrand ?? null;
+  const gaps = target ? findGaps(calls, target) : null;
+  const fixList =
+    target && gaps
+      ? generateFixList({ calls, gaps, target, trade: plan.category.trade, country: plan.country, questions: plan.questions })
+      : null;
+  const fixListNote =
+    fixList && fixList.length < MIN_FIXES
+      ? `This scan's evidence supports only ${fixList.length} action(s). Scan more questions or runs for a fuller list.`
+      : undefined;
+
   return {
     generatedAt: result.finishedAt,
     dryRun: result.dryRun,
@@ -118,11 +139,17 @@ export function buildReport(result: ScanResult): ScanReport {
     shareOfVoice,
     citedPages,
     pageTypeCounts,
+    targetBrand: target,
+    gaps,
+    fixList,
+    ...(fixListNote ? { fixListNote } : {}),
     calls,
   };
 }
 
 const cell = (s: string) => s.replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();
+
+const pageCell = (p: { title?: string; domain: string }) => cell(p.title && p.title !== p.domain ? `${p.title} (${p.domain})` : p.domain);
 
 export function toMarkdown(r: ScanReport): string {
   const lines: string[] = [];
@@ -153,23 +180,58 @@ export function toMarkdown(r: ScanReport): string {
   lines.push(`Page types: ${PAGE_TYPES.map((t) => `${t.replace("_", " ")} ${r.pageTypeCounts[t]}`).join(" · ")}`, "");
   lines.push("| Page | Type | Owner | Cited in | Engines | Brands in those answers |", "|---|---|---|---|---|---|");
   for (const p of r.citedPages) {
-    const label = cell(p.title && p.title !== p.domain ? `${p.title} (${p.domain})` : p.domain);
-    lines.push(`| [${label}](${p.url}) | ${p.pageType.replace("_", " ")} | ${cell(p.owner ?? "")} | ${p.citedIn} | ${p.engines.join(", ")} | ${cell(p.brandsInAnswers.join(", "))} |`);
+    lines.push(`| [${pageCell(p)}](${p.url}) | ${p.pageType.replace("_", " ")} | ${cell(p.owner ?? "")} | ${p.citedIn} | ${p.engines.join(", ")} | ${cell(p.brandsInAnswers.join(", "))} |`);
   }
   lines.push("");
+
+  if (!r.targetBrand || !r.gaps || !r.fixList) {
+    lines.push("## Gaps and fix list", "", "No target brand was set, so there are no gaps or fix list. Re-run with `--brand <your brand>`.", "");
+  } else {
+    const t = cell(r.targetBrand);
+    lines.push(`## Gaps: pages that cite competitors and not ${t}`, "");
+    if (r.gaps.length === 0) lines.push(`No cited page backs an answer that names competitors and leaves out ${t}.`, "");
+    else {
+      lines.push(
+        `Each row is a page cited by answers that name competitors but not ${t}. Answer labels (A1, A2, …) match the answers section.`,
+        "",
+        `| Page | Type | Cited in | Without ${t} | Engines | Competitors named | Answers |`,
+        "|---|---|---|---|---|---|---|",
+      );
+      for (const g of r.gaps) {
+        lines.push(
+          `| [${pageCell(g)}](${g.url}) | ${g.pageType.replace("_", " ")} | ${g.citedIn}/${g.answers} | ${g.gapAnswers} | ${g.engines.join(", ")} | ${cell(g.competitors.join(", "))} | ${g.evidence.map((e) => e.answerId).join(", ")} |`,
+        );
+      }
+      lines.push("");
+    }
+
+    lines.push(`## Fix list for ${t}`, "");
+    lines.push("Ranked by evidence strength: answers citing the page × 3 + engines × 2 + competitors named. Wording comes from field-service templates.", "");
+    if (r.fixListNote) lines.push(`> ${r.fixListNote}`, "");
+    for (const a of r.fixList) {
+      const evidence = a.evidence.map((e) => `${e.answerId} (${e.engine}, Q${e.questionIndex + 1}, run ${e.run}${e.citationIndex !== undefined ? `, citation ${e.citationIndex + 1}` : ""})`);
+      lines.push(`${a.rank}. **${cell(a.title)}** (score ${a.strength.score})`);
+      lines.push(`   - Why: ${cell(a.why)}`);
+      if (a.pages.length) lines.push(`   - Pages: ${a.pages.map((p) => `[${pageCell(p)}](${p.url})`).join(", ")}`);
+      lines.push(`   - Evidence: ${evidence.join(", ")}`);
+      lines.push(`   - What to do: ${cell(a.detail)}`);
+    }
+    lines.push("");
+  }
 
   lines.push("## Answers", "");
   r.questions.forEach((q, qi) => {
     lines.push(`### Q${qi + 1}. ${q}`, "");
-    for (const c of r.calls.filter((x) => x.questionIndex === qi)) {
-      const head = `**${c.engine}** (run ${c.run})`;
+    r.calls.forEach((c, ci) => {
+      if (c.questionIndex !== qi) return;
+      const head = `${answerId(ci)} **${c.engine}** (run ${c.run})`;
       if (c.status !== "ok") {
         lines.push(`- ${head}: ${c.status}: ${cell(c.error ?? "")}`);
-        continue;
+        return;
       }
       const brands = c.mentions.map((m) => `${m.position}. ${m.brand}`).join(", ") || "no tracked brands";
-      lines.push(`- ${head}: ${brands}. ${c.citations.length} citations. $${c.costUsd.toFixed(4)}`);
-    }
+      lines.push(`- ${head}: ${brands}. ${c.citations.length} citations. ${c.costUsd.toFixed(4)}`);
+    });
     lines.push("");
   });
 
