@@ -41,12 +41,14 @@ export function fixtureFetch(responses: unknown[]): FetchFn {
 export interface CreateAdaptersOptions {
   dryRun: boolean;
   env?: Env;
+  /** Dry runs only: canned responses per engine instead of reading fixtures/engines/*.json (bundled code can't read them). */
+  fixtures?: Partial<Record<EngineId, unknown[]>>;
 }
 
-export function createAdapters(engines: EngineId[], { dryRun, env = process.env }: CreateAdaptersOptions): EngineAdapter[] {
+export function createAdapters(engines: EngineId[], { dryRun, env = process.env, fixtures }: CreateAdaptersOptions): EngineAdapter[] {
   return engines.map((id) =>
     dryRun
-      ? FACTORIES[id]({ apiKey: "dry-run", fetch: fixtureFetch(loadFixtureResponses(id)), sleep: async () => {}, env })
+      ? FACTORIES[id]({ apiKey: "dry-run", fetch: fixtureFetch(fixtures?.[id] ?? loadFixtureResponses(id)), sleep: async () => {}, env })
       : FACTORIES[id]({ apiKey: env[KEY_ENV[id]] ?? "", env }),
   );
 }
