@@ -1,0 +1,3 @@
+# False positives only, one fingerprint per line, each with a reason.
+# Test sentinel "sentinel-gemini-3f9c" (not a key) in an earlier commit of PR #6; the test now builds its sentinels at runtime.
+13911e819e2c741bb90e605f60c9c1f9175e2697:src/report/client-boundary.test.tsx:generic-api-key:56
