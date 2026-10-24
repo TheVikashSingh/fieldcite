@@ -6,7 +6,7 @@ See who ChatGPT, Perplexity and Gemini recommend instead of you, and how to get 
 - [ACTION_PLAN.md](ACTION_PLAN.md): build plan and estimated release dates
 - [docs/research/distribution-strategy-report.md](docs/research/distribution-strategy-report.md): the market research behind this choice
 
-Status: week 2, data model and credit ledger.
+Status: week 3, report page and fix list.
 
 ## Development
 
@@ -37,6 +37,12 @@ For a real run, copy `.env.example` to `.env`, add the API keys, and add `--conf
 
 Categories (brands and question sets) live in `data/categories/<slug>.json`.
 
+## Report page
+
+`npm run build && npm start`, then open <http://localhost:3000/r/demo> for the sample report (SPEC F-2, F-3): share of voice, answers with brand positions (hover or tap a brand for the matching answer text), every cited page, the gaps view, the fix list with its evidence, and the method box (SPEC §8). It is built at build time from the fixtures through the dry-run path, so it makes no API calls.
+
+Real reports live at `/r/<share token>`. `saveReport` (`src/report/pg-source.ts`) stores a report in `scan_reports` and returns a random 32-character token; only its SHA-256 is stored. Unknown, malformed and revoked tokens all get the same 404, and `/r/*` pages send `noindex` and `Referrer-Policy: no-referrer`. The lookup needs `DATABASE_URL` on the server; without it every token is a 404. Report modules that touch the database import `server-only`, and CI builds with sentinel secrets and fails if any reaches the browser bundle (`scripts/check-client-bundle.sh`, CS-12).
+
 ## Database
 
 The schema (SPEC §6.2) is plain SQL in `supabase/migrations/`, with row-level security on every table. It runs on Supabase (`supabase db push`) or on any Postgres 15+, so no Supabase account is needed for development.
@@ -59,7 +65,7 @@ Cost safety around every call (`src/cost/`):
 
 ### Database tests
 
-The `*.db.test.ts` files (credit ledger concurrency in `src/ledger/`, breakers, cache and spend in `src/cost/`) need a real Postgres. They are skipped when `DATABASE_URL` is unset and only run against `localhost`. CI runs them in the `db-test` job. To run them locally with Docker:
+The `*.db.test.ts` files (credit ledger concurrency in `src/ledger/`, breakers, cache and spend in `src/cost/`, share links in `src/report/`) need a real Postgres. They are skipped when `DATABASE_URL` is unset and only run against `localhost`. CI runs them in the `db-test` job. To run them locally with Docker:
 
 ```bash
 docker run -d --name fieldcite-pg -e POSTGRES_PASSWORD=postgres -p 55432:5432 postgres:17

@@ -67,6 +67,18 @@ jobs:
       - run: npm test
       - name: Dry-run scan from fixtures
         run: npm run scan -- --category pest-control --country US --questions 3 --runs 1 --dry-run
+      # Sentinel values, not secrets: the bundle check fails if any reaches the browser (CS-12).
+      - name: Build
+        run: npm run build
+        env: &sentinels
+          OPENAI_API_KEY: sentinel-openai-build-7d21
+          PERPLEXITY_API_KEY: sentinel-perplexity-build-7d21
+          GEMINI_API_KEY: sentinel-gemini-build-7d21
+          DATABASE_URL: postgres://sentinel-build-7d21@localhost:1/sentinel
+          NEXT_TELEMETRY_DISABLED: "1"
+      - name: No secrets in client bundles
+        run: bash scripts/check-client-bundle.sh
+        env: *sentinels
 
   db-test:
     runs-on: ubuntu-latest
