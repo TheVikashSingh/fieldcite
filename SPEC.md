@@ -85,7 +85,7 @@ Google AI Mode (needs a paid third-party SERP API), Claude, Copilot, team seats,
 | Layer | Choice | Why |
 |---|---|---|
 | App | **Next.js (App Router) + TypeScript** on Vercel (free tier to start) | One language end to end; fast to build with Claude Code |
-| Database and login | **Supabase** (Postgres + Auth, free tier) | Managed Postgres with row-level security; magic-link login |
+| Database and login | **Supabase** Postgres (free tier); login is our own magic-link flow (one-time tokens stored as hashes in Postgres, a signed session cookie, email through **Resend**) | Managed Postgres with row-level security. Own login instead of Supabase Auth so it runs and is tested on plain Postgres in CI, with no Supabase account needed to develop |
 | Background jobs | **Trigger.dev** or **Inngest** (free tier) | Scans run as jobs with retries, timeouts and concurrency limits |
 | Email | **Resend** (free tier) | Digests, alerts, magic links |
 | Bot protection | **Cloudflare Turnstile** | Protects the free scan |

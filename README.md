@@ -43,6 +43,12 @@ Categories (brands and question sets) live in `data/categories/<slug>.json`.
 
 Real reports live at `/r/<share token>`. `saveReport` (`src/report/pg-source.ts`) stores a report in `scan_reports` and returns a random 32-character token; only its SHA-256 is stored. Unknown, malformed and revoked tokens all get the same 404, and `/r/*` pages send `noindex` and `Referrer-Policy: no-referrer`. The lookup needs `DATABASE_URL` on the server; without it every token is a 404. Report modules that touch the database import `server-only`, and CI builds with sentinel secrets and fails if any reaches the browser bundle (`scripts/check-client-bundle.sh`, CS-12).
 
+## Sign-in
+
+Magic-link login (SPEC F-9) at `/login`: enter an email, get a one-time link that expires in 15 minutes, press Continue, land on `/account`. It needs `DATABASE_URL`, `AUTH_SECRET` (32+ random characters) and, outside development, `APP_URL`, `RESEND_API_KEY` and `EMAIL_FROM`. In development without a Resend key, the email and its link are printed to the `next dev` log.
+
+How it stays safe: tokens are stored only as SHA-256 hashes and work once; at most 5 links per address per hour; the page says the same thing whether or not an address exists; opening a link changes nothing until Continue is pressed (email scanners prefetch links); the confirm and sign-out POSTs check the request comes from this site; the session is an HMAC-signed, `httpOnly` cookie that lasts 30 days.
+
 ## Cited-page enrichment
 
 Fills the action database (`cited_pages`, SPEC M-2) from a scan report: publisher, business contact page, submission ("get listed") page, sponsorship or advertise page, whether an affiliate or partner program is mentioned, and which known brands the page names. A dry run reads synthetic pages from `fixtures/pages/`, keeps results in memory and makes no network requests:
