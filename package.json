@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "scan": "tsx src/cli/scan.ts",
+    "enrich": "tsx src/cli/enrich.ts",
     "db:migrate": "tsx scripts/db-migrate.ts",
     "test:db": "vitest run db.test"
   },

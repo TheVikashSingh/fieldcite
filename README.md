@@ -43,6 +43,24 @@ Categories (brands and question sets) live in `data/categories/<slug>.json`.
 
 Real reports live at `/r/<share token>`. `saveReport` (`src/report/pg-source.ts`) stores a report in `scan_reports` and returns a random 32-character token; only its SHA-256 is stored. Unknown, malformed and revoked tokens all get the same 404, and `/r/*` pages send `noindex` and `Referrer-Policy: no-referrer`. The lookup needs `DATABASE_URL` on the server; without it every token is a 404. Report modules that touch the database import `server-only`, and CI builds with sentinel secrets and fails if any reaches the browser bundle (`scripts/check-client-bundle.sh`, CS-12).
 
+## Cited-page enrichment
+
+Fills the action database (`cited_pages`, SPEC M-2) from a scan report: publisher, business contact page, submission ("get listed") page, sponsorship or advertise page, whether an affiliate or partner program is mentioned, and which known brands the page names. A dry run reads synthetic pages from `fixtures/pages/`, keeps results in memory and makes no network requests:
+
+```bash
+npm run enrich -- --from out/scan-pest-control-us-dryrun-<timestamp>.json --dry-run
+```
+
+A real run (`--from <report> [--limit N]`, default 25 pages, max 200) needs `DATABASE_URL` and refuses reports from dry-run scans. The fetcher (`src/enrich/fetcher.ts`) follows SPEC §10:
+
+- robots.txt first, cached per origin; disallowed paths are skipped, and an unreachable robots.txt means "disallow all";
+- User-Agent `FieldCiteBot/0.1 (+<ENRICH_CONTACT_URL>)`;
+- at most 1 request per domain every 10 s, 3 in flight overall, 10 s timeout, 2 MB HTML-only body cap, one retry on 5xx only;
+- no cookies, credentials or logins, and nothing that gets around bot protection;
+- each page re-fetched at most once every 30 days; failed attempts count too.
+
+Enrichment only fills empty fields, so curator edits are never overwritten, and it never writes `curator_notes`, `outreach_outcome` or `sponsorship_price`. Only business routes are stored: no emails, personal profiles or author pages, and stored URLs drop their query string. Results go to `out/` (gitignored); never commit them.
+
 ## Database
 
 The schema (SPEC §6.2) is plain SQL in `supabase/migrations/`, with row-level security on every table. It runs on Supabase (`supabase db push`) or on any Postgres 15+, so no Supabase account is needed for development.
