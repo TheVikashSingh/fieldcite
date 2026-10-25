@@ -67,6 +67,8 @@ jobs:
       - run: npm test
       - name: Dry-run scan from fixtures
         run: npm run scan -- --category pest-control --country US --questions 3 --runs 1 --dry-run
+      - name: Dry-run enrichment from fixtures (no network)
+        run: npm run enrich -- --from "$(ls out/scan-*.json | head -n 1)" --dry-run
       # Sentinel values, not secrets: the bundle check fails if any reaches the browser (CS-12).
       - name: Build
         run: npm run build

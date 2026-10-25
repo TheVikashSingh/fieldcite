@@ -71,7 +71,7 @@
 - [ ] Landing page and free-scan form (F-1) with Turnstile, email verification and the abuse rules (CS-11).
 - [x] Report page (F-2): share of voice, per-question answers, citations, gaps view, method and disclaimer (SPEC §8). Served at `/r/<share token>` from Postgres (`scan_reports`, token stored hashed) and at `/r/demo` from the fixtures; saving a report when a scan finishes comes with the job runner.
 - [x] Fix-list generator (F-3) using FSM templates (M-4), with every action linked to stored evidence. The gaps view data (F-2) and `--brand` on the scan CLI come with it; any LLM rewording sits behind an interface capped at 1,500 output tokens (CS-6) and is not wired up yet.
-- [ ] Cited-page enrichment (M-2): polite fetch, robots.txt respected, submission/affiliate/contact detection.
+- [x] Cited-page enrichment (M-2): polite fetch, robots.txt respected, submission/affiliate/contact detection. `npm run enrich -- --from <scan report> [--limit N] [--dry-run]` fills only empty `cited_pages` fields (curator edits are kept); running it on real reports waits for a database and the job runner.
 - [ ] Magic-link login (F-9).
 
 **Exit:** a stranger can get a free scan report in under 3 minutes with no help.

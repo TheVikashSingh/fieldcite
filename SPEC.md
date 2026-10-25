@@ -119,7 +119,7 @@ interface EngineAdapter {
 - `engine_calls` (scan_id, engine, model, question_id, input and output tokens, search_calls, cost_usd, latency_ms, status, error, cache_hit)
 - `answers` (engine_call_id, text, created_at), `brand_mentions` (answer_id, brand_id, position, sentiment)
 - `citations` (answer_id, url, cited_page_id)
-- `cited_pages`, the **action database** (url, domain, page_type, publisher, contact_url, submission_url, affiliate_program, sponsorship_price, brands_mentioned[], last_fetched_at, curator_notes, outreach_outcome)
+- `cited_pages`, the **action database** (url, domain, page_type, publisher, contact_url, submission_url, sponsorship_url, affiliate_program, sponsorship_price, brands_mentioned[], last_fetched_at, curator_notes, outreach_outcome)
 - `credit_ledger` (account_id, delta, reason, scan_id, balance_after), `spend_daily` (date, engine, scope, usd)
 - `answer_cache` (engine, model, normalized_question_hash, answer_id, expires_at); the hash covers the normalized question, country and run number
 - `cost_settings` (breaker limits and forecasts), `breaker_trips` and the `breaker_status` view (CS-7)
@@ -171,7 +171,7 @@ A single abusive user, retry loop or leaked key must never produce a surprise bi
 ## 10. Legal and compliance
 
 - **Official APIs only.** No scraping of AI apps, no logged-in automation, no getting around bot protection.
-- **Enriching cited pages (M-2):** a polite, low-frequency fetch of *publicly cited* URLs only. Respect robots.txt, send an identifying user agent, and cache results. Store **business** contact routes (contact pages, submission forms), never personal profiles or emails pulled from people's accounts.
+- **Enriching cited pages (M-2):** a polite, low-frequency fetch of *publicly cited* URLs only. Respect robots.txt, send an identifying user agent, and cache results. Limits: at most 1 request per domain every 10 s and a few in flight overall, a 10 s timeout, a 2 MB HTML-only body cap, one retry on 5xx only, no cookies or logins, and each page re-fetched at most once every 30 days. Enrichment only fills empty fields, so curator edits are never overwritten. Store **business** contact routes (contact pages, submission forms), never personal profiles or emails pulled from people's accounts.
 - We sell **analysis and recommendations**, not personal-data lists.
 - Paid placements we recommend must be **disclosed as sponsored** on the publisher's side (FTC Endorsement Guides). We never recommend fake reviews or astroturfing.
 - A privacy policy and terms of service ship at launch, along with a data-deletion request flow and a GDPR-friendly data-processing summary.

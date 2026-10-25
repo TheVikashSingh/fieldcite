@@ -1,0 +1,8 @@
+# Synthetic robots.txt for dry runs. Forum threads under /r/ are off limits to every bot.
+User-agent: *
+Disallow: /r/
+Disallow: /admin/
+
+User-agent: FieldCiteBot
+Disallow: /r/
+Disallow: /private/
