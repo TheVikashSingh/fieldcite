@@ -68,13 +68,13 @@
 
 *Nov 9–15 · about 22 h*
 
-- [ ] Landing page and free-scan form (F-1) with Turnstile, email verification and the abuse rules (CS-11).
+- [x] Landing page and free-scan form (F-1) with Turnstile, email verification and the abuse rules (CS-11). The scan starts only from the emailed link and runs through the ledger, breakers and kill switch; until the job runner exists it runs in-process after the response (`after()`).
 - [x] Report page (F-2): share of voice, per-question answers, citations, gaps view, method and disclaimer (SPEC §8). Served at `/r/<share token>` from Postgres (`scan_reports`, token stored hashed) and at `/r/demo` from the fixtures; saving a report when a scan finishes comes with the job runner.
 - [x] Fix-list generator (F-3) using FSM templates (M-4), with every action linked to stored evidence. The gaps view data (F-2) and `--brand` on the scan CLI come with it; any LLM rewording sits behind an interface capped at 1,500 output tokens (CS-6) and is not wired up yet.
 - [x] Cited-page enrichment (M-2): polite fetch, robots.txt respected, submission/affiliate/contact detection. `npm run enrich -- --from <scan report> [--limit N] [--dry-run]` fills only empty `cited_pages` fields (curator edits are kept); running it on real reports waits for a database and the job runner.
 - [x] Magic-link login (F-9). Our own flow on Postgres (hashed one-time tokens, signed session cookie, Resend email; links print to the server log in development), so it needs no Supabase account (SPEC §6).
 
-**Exit:** a stranger can get a free scan report in under 3 minutes with no help.
+**Exit:** a stranger can get a free scan report in under 3 minutes with no help. Met against fixture engines: about 1 minute from the landing page to the report in the browser, and the end-to-end database test (`src/freescan/freescan.db.test.ts`) asserts under 3 minutes. Re-check with live engines once API keys exist.
 
 ## Week 4: Public pages, load test, private beta (M2)
 

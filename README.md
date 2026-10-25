@@ -43,6 +43,14 @@ Categories (brands and question sets) live in `data/categories/<slug>.json`.
 
 Real reports live at `/r/<share token>`. `saveReport` (`src/report/pg-source.ts`) stores a report in `scan_reports` and returns a random 32-character token; only its SHA-256 is stored. Unknown, malformed and revoked tokens all get the same 404, and `/r/*` pages send `noindex` and `Referrer-Policy: no-referrer`. The lookup needs `DATABASE_URL` on the server; without it every token is a 404. Report modules that touch the database import `server-only`, and CI builds with sentinel secrets and fails if any reaches the browser bundle (`scripts/check-client-bundle.sh`, CS-12).
 
+## Free scan
+
+The landing page (`/`) has the free-scan form (SPEC F-1): work email, company website, product name, category, buyers' country and up to 3 competitors. Submitting it sends a confirmation link. The scan starts only when that link is confirmed; it is 5 questions × 3 engines × 1 run (15 calls). `/scan/<token>` shows progress, then opens the report at `/r/<token>`, and the link is emailed too.
+
+Abuse controls (CS-11), checked in this order: kill switch (CS-8); input; disposable-email blocklist; Cloudflare Turnstile (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`; required in production); free and total breakers (CS-7); at most 3 requests per IP per day (IPs are stored only as keyed hashes); 1 verified free scan per email and per company domain every 30 days. The email/domain and breaker checks run again inside the confirmation transaction, which also grants and reserves the 15 credits (CS-4), so two pending requests can't both start.
+
+Try it locally with Postgres running and `DATABASE_URL` and `AUTH_SECRET` set: `npm run dev`, fill in the form, copy the link from the dev log, press Continue. In development, `ENGINE_MODE=fixtures` (the default) answers from the synthetic fixtures, so it costs nothing and the report says "Sample data".
+
 ## Sign-in
 
 Magic-link login (SPEC F-9) at `/login`: enter an email, get a one-time link that expires in 15 minutes, press Continue, land on `/account`. It needs `DATABASE_URL`, `AUTH_SECRET` (32+ random characters) and, outside development, `APP_URL`, `RESEND_API_KEY` and `EMAIL_FROM`. In development without a Resend key, the email and its link are printed to the `next dev` log.
