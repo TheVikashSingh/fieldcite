@@ -18,9 +18,14 @@ export const isShareToken = (token: string) => TOKEN_PATTERN.test(token);
 
 const tokenHash = (token: string) => createHash("sha256").update(token, "utf8").digest();
 
-/** Stores a scan's report and returns its share token. The token is not stored, only its hash. */
-export async function saveReport(db: Queryable, scanId: string, report: ScanReport): Promise<string> {
-  const token = newShareToken();
+export const shareTokenHash = (token: string) => tokenHash(token);
+
+/**
+ * Stores a scan's report and returns its share token. The token is not stored, only its hash.
+ * Free scans pass the token their status page already uses, so /scan/<token> can lead to /r/<token>.
+ */
+export async function saveReport(db: Queryable, scanId: string, report: ScanReport, token: string = newShareToken()): Promise<string> {
+  if (!isShareToken(token)) throw new Error("saveReport: invalid share token");
   await db.query("insert into public.scan_reports (scan_id, share_token_hash, report) values ($1, $2, $3)", [
     scanId,
     tokenHash(token),

@@ -22,7 +22,8 @@ function sourceFiles(dir: string): string[] {
 
 const files = sourceFiles(root).map((path) => ({ path: relative(root, path).replace(/\\/g, "/"), code: readFileSync(path, "utf8") }));
 const isClient = (code: string) => /^\s*(\/\/[^\n]*\n\s*|\/\*[^]*?\*\/\s*)*["']use client["']/.test(code);
-const SERVER_IMPORT = /from\s+["'](pg|node:[^"']+|server-only|[./]*(ledger|cost|engines|scan|report\/(server|pg-source|demo-source))(\/[^"']*)?)["']/;
+const SERVER_IMPORT =
+  /from\s+["'](pg|node:[^"']+|server-only|next\/headers|[./]*(ledger|cost|engines|scan|auth|email|server|enrich|freescan|report\/(server|pg-source|demo-source))(\/[^"']*)?)["']/;
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -39,9 +40,13 @@ describe("client boundary", () => {
   });
 
   it("the report page has no client components at all", () => {
-    for (const f of files.filter((x) => x.path.startsWith("app/") || x.path.startsWith("report/"))) {
+    for (const f of files.filter((x) => x.path.startsWith("app/r/") || x.path.startsWith("report/"))) {
       expect(isClient(f.code), f.path).toBe(false);
     }
+  });
+
+  it("the only client component outside the report is the free-scan form", () => {
+    expect(files.filter((f) => isClient(f.code)).map((f) => f.path)).toEqual(["app/FreeScanForm.tsx"]);
   });
 
   it("modules that touch the database or fixtures are marked server-only", () => {

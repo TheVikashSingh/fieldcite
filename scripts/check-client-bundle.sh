@@ -3,7 +3,7 @@
 # after `npm run build` with sentinel values (not real secrets) in these variables; CI does.
 set -euo pipefail
 
-names=(OPENAI_API_KEY PERPLEXITY_API_KEY GEMINI_API_KEY DATABASE_URL AUTH_SECRET RESEND_API_KEY)
+names=(OPENAI_API_KEY PERPLEXITY_API_KEY GEMINI_API_KEY DATABASE_URL AUTH_SECRET RESEND_API_KEY TURNSTILE_SECRET_KEY)
 [ -d .next/static ] || { echo "No .next/static: run npm run build first." >&2; exit 1; }
 
 # Browser bundles, plus the prerendered HTML and RSC payloads served to visitors.

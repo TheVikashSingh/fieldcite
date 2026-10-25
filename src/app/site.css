@@ -72,3 +72,22 @@ body {
   color: var(--site-error);
   font-weight: 600;
 }
+.site-success {
+  border-left: 4px solid var(--site-accent);
+  padding: 0.5rem 0.75rem;
+}
+.site-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.25rem 1rem;
+}
+.site-check {
+  font-weight: 400;
+}
+.site-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.site-narrow a {
+  color: var(--site-accent);
+}
