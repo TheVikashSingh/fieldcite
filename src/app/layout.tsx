@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import "./site.css";
 
 export const metadata: Metadata = {
   title: "FieldCite",

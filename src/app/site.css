@@ -1,0 +1,74 @@
+/* Shared styles for the landing, login and account pages. The report has its own (r/report.css). */
+:root {
+  --site-fg: #1a1d21;
+  --site-muted: #5b6470;
+  --site-accent: #1f5fbf;
+  --site-border: #d4d9e0;
+  --site-error: #a3261f;
+  --site-bg: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --site-fg: #e8eaed;
+    --site-muted: #a2abb7;
+    --site-accent: #7fb0ff;
+    --site-border: #3a414b;
+    --site-error: #ff8a80;
+    --site-bg: #14171b;
+  }
+}
+body {
+  margin: 0;
+  background: var(--site-bg);
+  color: var(--site-fg);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+.site-narrow {
+  max-width: 640px;
+  margin: 3rem auto;
+  padding: 0 16px;
+}
+.site-form {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+.site-form label {
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+.site-form input,
+.site-form select {
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--site-border);
+  border-radius: 6px;
+  background: var(--site-bg);
+  color: var(--site-fg);
+}
+.site-form fieldset {
+  border: 1px solid var(--site-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+.site-button,
+.site-form button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--site-accent);
+  color: #fff;
+  cursor: pointer;
+  justify-self: start;
+}
+.site-hint {
+  color: var(--site-muted);
+  font-size: 0.9rem;
+}
+.site-error {
+  color: var(--site-error);
+  font-weight: 600;
+}

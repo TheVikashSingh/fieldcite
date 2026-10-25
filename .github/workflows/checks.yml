@@ -77,6 +77,10 @@ jobs:
           PERPLEXITY_API_KEY: sentinel-perplexity-build-7d21
           GEMINI_API_KEY: sentinel-gemini-build-7d21
           DATABASE_URL: postgres://sentinel-build-7d21@localhost:1/sentinel
+          AUTH_SECRET: sentinel-auth-secret-build-7d21-0123456789
+          RESEND_API_KEY: sentinel-resend-build-7d21
+          EMAIL_FROM: FieldCite <noreply@fieldcite.test>
+          APP_URL: http://localhost:3000
           NEXT_TELEMETRY_DISABLED: "1"
       - name: No secrets in client bundles
         run: bash scripts/check-client-bundle.sh
